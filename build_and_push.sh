@@ -27,7 +27,7 @@ fi
 region=$(aws configure get region)
 region=${region:-eu-west-1}
 
-fullname="${account}.dkr.ecr.${region}.amazonaws.com/${image}:latest"
+fullname="${account}.dkr.ecr.${region}.amazonaws.com/${image}"
 
 # If the repository doesn't exist in ECR, create it.
 
@@ -45,10 +45,10 @@ $(aws ecr get-login --region ${region} --no-include-email)
 # with the full name.
 for os_type in "cpu" "gpu" ; do
 
-    docker build -t "${image}-${os_type}" -f "Dockerfile.${os_type}"
-    docker tag "${image}-${os_type}" "${fullname}-${os_type}"
+    docker build -t "${image}:${os_type}" -f "Dockerfile.${os_type}"
+    docker tag "${image}:${os_type}" "${fullname}:${os_type}"
 
-    docker push "${fullname}-${os_type}"
+    docker push "${fullname}:${os_type}"
 
 done
 
