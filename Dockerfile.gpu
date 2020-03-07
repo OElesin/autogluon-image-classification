@@ -35,8 +35,8 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
  && ln -s /usr/local/bin/pip3 /usr/bin/pip \
 
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r /opt/program/requirements.txt
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r /opt/program/requirements.txt
 
 RUN pip install --upgrade mxnet-cu100 \
     && pip install autogluon
