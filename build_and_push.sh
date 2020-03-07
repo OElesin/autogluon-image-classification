@@ -43,8 +43,15 @@ $(aws ecr get-login --region ${region} --no-include-email)
 
 # Build the docker image locally with the image name and then push it to ECR
 # with the full name.
+for os_type in "cpu" "gpu" ; do
 
-docker build  -t ${image} .
-docker tag ${image} ${fullname}
+    docker build -t "${image}:${os_type}" -f "Dockerfile.${os_type}"
+    docker tag "${image}:${os_type}" "${fullname}:${os_type}"
 
-docker push ${fullname}
+    docker push "${fullname}:${os_type}"
+
+done
+
+
+
+
