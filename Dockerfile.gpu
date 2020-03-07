@@ -27,6 +27,7 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 ENV PATH="/opt/program:${PATH}"
 ENV MODEL_PATH="/opt/ml/model"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/cuda-10.0/lib64/"
 
 # Set up the program in the image
 COPY model /opt/program
