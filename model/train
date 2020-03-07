@@ -69,7 +69,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_dir', type=str, default='/opt/ml/model')
     parameters = json.load(open(param_path))
     epochs = parameters.get('epochs', 5)
-    ngpus_per_trial = parameters.get('ngpus-per-trial', 10)
+    ngpus_per_trial = int(parameters.get('ngpus-per-trial', 10))
     args, _ = parser.parse_known_args()
     train_files = args.train
     test_files = args.test

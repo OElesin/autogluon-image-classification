@@ -1,6 +1,6 @@
 # Deploy AutoGluon MxNet on SageMaker
 
-![Build Status](https://codebuild.eu-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiejdGeFBYcGFCY1J3aC9HUWhwbE95ZEkrcVluZFZvNXE2aG11bDZoMzFHQnJjNmhFWVF1NlpTdUNYSzNBRXdnZ1hNd2txYVJybVhWYWtFK0xRektkN2VBPSIsIml2UGFyYW1ldGVyU3BlYyI6IlVPSldqa0VTUWo4V1M1eG0iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+![Build Status](https://codebuild.eu-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiY2dRM3JmOXMyUkZRVHEyb2VjOWV1TUFxZzEwam5yeDRXbURxTTRWVHNVWGRtb09RanBGd290d1hjWGdRMUJSejNqRkdPaG5jZVh5UkZFcnJFbkFCd1hZPSIsIml2UGFyYW1ldGVyU3BlYyI6ImhMSHFHTXZJN0hTMDVIRlEiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 
 
 ![AutoGluon on SageMaker](./autogluon-on-sagemaker.png)
