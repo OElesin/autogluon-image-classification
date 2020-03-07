@@ -1,4 +1,4 @@
-# Deploy AutoGluon MxNet on SageMaker
+# Deploy AutoGluon Image Classifier on SageMaker
 
 ![Build Status](https://codebuild.eu-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiY2dRM3JmOXMyUkZRVHEyb2VjOWV1TUFxZzEwam5yeDRXbURxTTRWVHNVWGRtb09RanBGd290d1hjWGdRMUJSejNqRkdPaG5jZVh5UkZFcnJFbkFCd1hZPSIsIml2UGFyYW1ldGVyU3BlYyI6ImhMSHFHTXZJN0hTMDVIRlEiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 
