@@ -10,71 +10,44 @@ import os
 import json
 import mxnet
 import autogluon as ag
-from autogluon import TabularPrediction as task
-import pandas as pd
+from autogluon import ImageClassification as task, Categorical
+from mxnet import optimizer as optim
 
-
-# These are the paths to where SageMaker mounts interesting things in your container.
-from autogluon.task.tabular_prediction import TabularDataset
 
 prefix = '/opt/ml/'
+
 
 input_path = prefix + 'input/data'
 output_path = os.path.join(prefix, 'output')
 param_path = os.path.join(prefix, 'input/config/hyperparameters.json')  # make it a dict with kwargs
-default_label_column = 'class'
 
 # AutoGluon Tabular Task Tuning Parameters
-# Read more: https://autogluon.mxnet.io/tutorials/tabular_prediction/tabular-indepth.html
+# Read more: https://autogluon.mxnet.io/tutorials/image_classification/hpo.html
 search_strategy = 'skopt'
+search_options = {'base_estimator': 'RF', 'acq_func': 'EI'}
 time_limits = 5 * 60  # train various models for ~2 min
-num_trials = 5
-hp_tune = True  # whether or not to do hyperparameter optimization
-
-nn_options = {
-    'num_epochs': 20,
-    'learning_rate': ag.space.Real(1e-4, 1e-2, default=5e-4, log=True),
-    'activation': ag.space.Categorical('relu', 'softrelu', 'tanh'),
-    'layers': ag.space.Categorical([100], [1000], [200, 100], [300, 200, 100]),
-    'dropout_prob': ag.space.Real(0.0, 0.5, default=0.1),
-}
-
-gbm_options = {
-    'num_boost_round': 100,
-    'num_leaves': ag.space.Int(lower=26, upper=66, default=36),
-}
-
-hyper_parameters = {'NN': nn_options, 'GBM': gbm_options}
-
-
-def __load_input_data(path: str) -> TabularDataset:
-    """
-    Load training data as dataframe
-    :param path:
-    :return: DataFrame
-    """
-    input_data_files = os.listdir(path)
-    input_dfs = [pd.read_csv(f'{path}/{data_file}') for data_file in input_data_files]
-    return task.Dataset(df=pd.concat(input_dfs))
 
 
 def train(parameters=None):
     try:
         # load training data
-        train_data = __load_input_data(train_files)
-        test_data = __load_input_data(test_files)
-        predictor = task.fit(
-            train_data=train_data,
-            tuning_data=test_data,
-            label=label_column,
-            output_directory=model_dir,
+        train_dataset = task.Dataset(train_files)
+        classifier = task.fit(
+            train_dataset,
+            # net=ag.space.Categorical['resnet18_v1', 'resnet34_v1']('ResNet50_v1b', 'ResNet18_v1b', 'MobileNet0.25'),
+            search_strategy=search_strategy,
+            search_options=search_options,
             time_limits=time_limits,
-            num_trials=num_trials,
-            hyperparameter_tune=hp_tune,
-            hyperparameters=hyper_parameters,
-            search_strategy=search_strategy
+            epochs=epochs,
+            ngpus_per_trial=ngpus_per_trial,
+            output_directory=model_dir
         )
         print('Training complete!!')
+        print('Evaluate Autogluon Image Classifier')
+        test_dataset = task.Dataset(test_files, train=False)
+        test_acc = classifier.evaluate(test_dataset)
+        print('Top-1 test acc: %.3f' % test_acc)
+        print('Evaluation completed')
     except Exception as e:
         # Write out an error file. This will be returned as the failureReason in the
         # DescribeTrainingJob result.
@@ -91,14 +64,17 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--train', type=str, default='/opt/ml/input/data/training')
     parser.add_argument('--test', type=str, default='/opt/ml/input/data/testing')
+    parser.add_argument('--epochs', type=int, default=5)
+    parser.add_argument('--ngpus-per-trial', type=int, default=10)
     parser.add_argument('--model_dir', type=str, default='/opt/ml/model')
     parameters = json.load(open(param_path))
-    label_column = parameters.get('label-column', default_label_column)
+    epochs = parameters.get('epochs', 5)
+    ngpus_per_trial = parameters.get('ngpus-per-trial', 10)
     args, _ = parser.parse_known_args()
     train_files = args.train
     test_files = args.test
     model_dir = args.model_dir
-    print(f"Parameters: {os.listdir(train_files)}")
+    print(f"Images Classes: {os.listdir(train_files)}")
     train()
     # A zero exit code causes the job to be marked a Succeeded.
     sys.exit(0)

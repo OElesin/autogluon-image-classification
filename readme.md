@@ -31,21 +31,23 @@ import sagemaker as sage
 from sagemaker import get_execution_role
 from sagemaker.predictor import csv_serializer
 
-image_tag = 'logistic-regression' # use the <image_name> defined earlier
+image_tag = 'autogluon-image-classification' # use the <image_name> defined earlier
 sess = sage.Session()
 role = get_execution_role()
 account = sess.boto_session.client('sts').get_caller_identity()['Account']
 region = sess.boto_session.region_name
 image = f'{account}.dkr.ecr.{region}.amazonaws.com/{image_tag}:latest'
 
-training_data = 's3://autogluon/datasets/Inc/train.csv'
-test_data = 's3://autogluon/datasets/Inc/test.csv'
+training_data = 's3://autogluon/datasets/shopee-iet/data/train'
+test_data = 's3://autogluon/datasets/shopee-iet/data/test'
 
 artifacts = 's3://<your-bucket>/artifacts'
-sm_model = sage.estimator.Estimator(image,
-                                   role,
-                                   1,
-                                   'ml.c4.xlarge', output_path=artifacts, sagemaker_session=sess)
+sm_model = sage.estimator.Estimator(
+    image,
+    role,
+    1,
+    'ml.p2.xlarge', output_path=artifacts, sagemaker_session=sess
+)
 
 # Run the train program because it is expected
 sm_model.fit(
