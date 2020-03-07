@@ -23,11 +23,11 @@ RUN pip install --upgrade mxnet-cu100 \
 # keeps Python from writing the .pyc files which are unnecessary in this case. We also update
 # PATH so that the train and serve programs are found when the container is invoked.
 
-ENV PYTHONUNBUFFERED=TRUE
-ENV PYTHONDONTWRITEBYTECODE=TRUE
-ENV PATH="/opt/program:${PATH}"
-ENV MODEL_PATH="/opt/ml/model"
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/cuda-10.0/lib64/"
+ENV PYTHONUNBUFFERED=TRUE \
+    PYTHONDONTWRITEBYTECODE=TRUE \
+    PATH="/opt/program:${PATH}" \
+    MODEL_PATH="/opt/ml/model" \
+    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
 
 # Set up the program in the image
 COPY model /opt/program
