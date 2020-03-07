@@ -4,6 +4,18 @@ FROM nvidia/cuda:10.1-base-ubuntu16.04
 # start from scratch.
 COPY requirements.txt /opt/program/requirements.txt
 
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONIOENCODING=UTF-8 \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PATH="/opt/program:${PATH}" \
+    MODEL_PATH="/opt/ml/model" \
+    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" \
+    DGLBACKEND=mxnet \
+    CUDNN_VERSION=7.6.0.64-1+cuda10.1 \
+    NCCL_VERSION=2.4.8-1+cuda10.1
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     nginx \
@@ -45,15 +57,6 @@ RUN pip install --upgrade mxnet-cu100 \
 # output stream, which means that logs can be delivered to the user quickly. PYTHONDONTWRITEBYTECODE
 # keeps Python from writing the .pyc files which are unnecessary in this case. We also update
 # PATH so that the train and serve programs are found when the container is invoked.
-
-ENV PYTHONUNBUFFERED=TRUE \
-    PYTHONDONTWRITEBYTECODE=TRUE \
-    PATH="/opt/program:${PATH}" \
-    MODEL_PATH="/opt/ml/model" \
-    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" \
-    DGLBACKEND=mxnet \
-    CUDNN_VERSION=7.6.0.64-1+cuda10.1 \
-    NCCL_VERSION=2.4.8-1+cuda10.1
 
 
 # Set up the program in the image
