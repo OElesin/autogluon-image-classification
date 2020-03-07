@@ -88,7 +88,7 @@ RUN ${PIP} --no-cache-dir install --upgrade \
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r /opt/program/requirements.txt
 
-RUN pip install --upgrade mxnet-cu100 \
+RUN pip install --upgrade ${MX_URL} awscli \
     && pip install autogluon
 
 # Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
