@@ -75,6 +75,18 @@ RUN wget ${CUDA_LIB_URL}/libcublas10_10.2.1.243-1_amd64.deb \
     cuda-nvrtc-10-1_10.1.243-1_amd64.deb \
     cuda-nvrtc-dev-10-1_10.1.243-1_amd64.deb
 
+# Install Open MPI
+RUN mkdir /tmp/openmpi \
+     && cd /tmp/openmpi \
+     && curl -fSsL -O https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.gz \
+     && tar zxf openmpi-4.0.1.tar.gz \
+     && cd openmpi-4.0.1 \
+     && ./configure --enable-orterun-prefix-by-default \
+     && make -j $(nproc) all \
+     && make install \
+     && ldconfig \
+     && rm -rf /tmp/openmpi
+
 
 # Create a wrapper for OpenMPI to allow running as root by default
 RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real \
