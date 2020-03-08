@@ -53,6 +53,48 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 
+# Install cuda-dev libraries as a dependency for Horovod with MXNet backend
+ENV CUDA_LIB_URL=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64
+RUN wget ${CUDA_LIB_URL}/libcublas10_10.2.1.243-1_amd64.deb \
+    ${CUDA_LIB_URL}/libcublas-dev_10.2.1.243-1_amd64.deb \
+    ${CUDA_LIB_URL}/cuda-curand-dev-10-1_10.1.243-1_amd64.deb \
+    ${CUDA_LIB_URL}/cuda-cusolver-dev-10-1_10.1.243-1_amd64.deb \
+    ${CUDA_LIB_URL}/cuda-nvrtc-10-1_10.1.243-1_amd64.deb \
+    ${CUDA_LIB_URL}/cuda-nvrtc-dev-10-1_10.1.243-1_amd64.deb \
+ && dpkg -i libcublas10_10.2.1.243-1_amd64.deb \
+    libcublas-dev_10.2.1.243-1_amd64.deb \
+    cuda-curand-dev-10-1_10.1.243-1_amd64.deb \
+    cuda-cusolver-dev-10-1_10.1.243-1_amd64.deb \
+    cuda-nvrtc-10-1_10.1.243-1_amd64.deb \
+    cuda-nvrtc-dev-10-1_10.1.243-1_amd64.deb \
+ && apt-get install -f \
+ && rm libcublas10_10.2.1.243-1_amd64.deb \
+    libcublas-dev_10.2.1.243-1_amd64.deb \
+    cuda-curand-dev-10-1_10.1.243-1_amd64.deb \
+    cuda-cusolver-dev-10-1_10.1.243-1_amd64.deb \
+    cuda-nvrtc-10-1_10.1.243-1_amd64.deb \
+    cuda-nvrtc-dev-10-1_10.1.243-1_amd64.deb
+
+
+# Create a wrapper for OpenMPI to allow running as root by default
+RUN mv /usr/local/bin/mpirun /usr/local/bin/mpirun.real \
+ && echo '#!/bin/bash' > /usr/local/bin/mpirun \
+ && echo 'mpirun.real --allow-run-as-root "$@"' >> /usr/local/bin/mpirun \
+ && chmod a+x /usr/local/bin/mpirun
+
+# Configure OpenMPI to run good defaults:
+#   --bind-to none --map-by slot --mca btl_tcp_if_exclude lo,docker0
+RUN echo "hwloc_base_binding_policy = none" >> /usr/local/etc/openmpi-mca-params.conf \
+ && echo "rmaps_base_mapping_policy = slot" >> /usr/local/etc/openmpi-mca-params.conf
+
+# Set default NCCL parameters
+RUN echo NCCL_DEBUG=INFO >> /etc/nccl.conf
+
+ENV LD_LIBRARY_PATH=/usr/local/openmpi/lib:$LD_LIBRARY_PATH
+ENV PATH=/usr/local/openmpi/bin/:$PATH
+ENV PATH=/usr/local/nvidia/bin:$PATH
+
+
 RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz \
     && tar -xvf Python-$PYTHON_VERSION.tgz \
     && cd Python-$PYTHON_VERSION \
